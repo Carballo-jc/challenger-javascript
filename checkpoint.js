@@ -33,13 +33,9 @@ const {
 // < 16
 
 function exponencial(exp) {
-    return function (x) {
-      // let exponente = x ** exp;
-      // return exponente;
-      return x ** exp;
-      //   return Math.pow(x, exp);
-    };
-
+    return function (num) {
+        return num ** exp;
+    }
 }
 
 // ----- Recursión -----
@@ -50,18 +46,18 @@ function exponencial(exp) {
 // que se deben realizar, para llegar al destino de un laberinto dado.
 //
 // Ejemplo: dado el siguiente laberinto:
-// let laberintoExample = { // direccion = ""
+// let laberintoExample = {         // direccion = ""
 //     N: 'pared',
-//     S: { // direccion = "S"
+//     S: {                         // direccion = "S"
 //         N: 'pared',
 //         S: 'pared',
-//         E: { // direccion = "SE"
-//             N: 'destino', // direccion = "SEN"
+//         E: {                     // direccion = "SE"
+//             N: 'destino',        // direccion = "SEN"
 //             S: 'pared',
 //             E: 'pared',
 //             O: 'pared'
 //         },
-//         O: { // direccion = "SO"
+//         O: {                     // direccion = "SO"
 //             N: 'pared',
 //             S: 'pared',
 //             E: 'pared',
@@ -75,20 +71,20 @@ function exponencial(exp) {
 // haciendo los movimientos SUR->ESTE->NORTE
 // Aclaraciones: el segundo parametro que recibe la funcion ('direccion') puede ser pasado vacio (null)
 
-function direcciones(laberinto, direccion = "") {
-  if (!laberinto) return direccion;
-  for (let key in laberinto) {
-    if (laberinto[key] === "destino") {
-      direccion += key;
-      return direccion;
+function direcciones(laberinto) {
+    if (laberinto === null || laberinto === undefined || typeof laberinto !== 'object') return '';
+    let string = '';
+    for (key in laberinto) {
+        if (typeof laberinto[key] === 'object') {
+            return string + key + direcciones(laberinto[key]);
+        } else if (laberinto[key] === 'destino') {
+            return string + key;
+        }
     }
-    if (typeof laberinto[key] === "object") {
-      direccion += key;
-      return direcciones(laberinto[key], direccion);
-    }
-  }
-  return direccion;
+    return string;
 }
+
+
 
 // EJERCICIO 3
 // Crea la funcion 'deepEqualArrays':
@@ -103,80 +99,15 @@ function direcciones(laberinto, direccion = "") {
 // deepEqualArrays([0,1,2], [0,1,2,3]) => false
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
-
 function deepEqualArrays(arr1, arr2) {
-  if ( arr1.length !== arr2.length ) {
-    return false;
-  }
-  return arr1.every((item, index) => {
-    if(Array.isArray(item)) { return deepEqualArrays(item,  arr2[index]); }
-    return arr2[index] === index
-  });
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0;i<arr1.length;i++) {
+        if (typeof arr1[i] != typeof arr2[i]) return false;
+        if (arr1[i] != arr2[i]) return false;
+        if (typeof arr1[i] == 'object') deepEqualArrays(arr1[i],arr2[i]);
+    }
+    return true;
 }
-// function deepEqualArrays2(arr1, arr2) {
-//   if (arr1.length !== arr2.length) {
-//     return false;
-//   }
-//   function anther(arg) {
-//         let j = 0;
-//         if (Array.isArray(arg)) {
-//           if (j < arg.length) {
-//             let x = j;
-//             j++;
-//             return anther(arg[x]);
-//           }
-//         } else {
-//           return arg;
-//         }
-//       }
-//   var result1= arr1.map((item) => anther(item));
-//   var result2= arr2.map((item) => anther(item));
-//  return result1 === result2;
-
-  // if (arr1.length !== arr2.length) {
-  //   return false;
-  // }
-  // let len = arr1.length < arr2.length ? arr1.length : arr2.length;
-  // let checker = 0;
-  // for (let z = 0; z < len; z++) {
-  //   if (arr1[z] === arr2[z]) {
-  //     checker++;
-  //   } else {
-  //     checker = checker > 0 ? (checker = checker - 1) : 0;
-  //   }
-  // }
-  // if (checker > 0) {
-  //   return true;
-  // } else if (checker === 0) {
-  //   let newArray1 = [];
-  //   let newArray2 = [];
-  //   function validateIsArray(arg, newArr) {
-  //     let j = 0;
-  //     if (Array.isArray(arg)) {
-  //       if (j < arg.length) {
-  //         let x = j;
-  //         j++;
-  //         return validateIsArray(arg[x]);
-  //       }
-  //     } else {
-  //       newArr.push(arg);
-  //     }
-  //   }
-  //   for (let i = 0; i < arr1.length; i++) {
-  //     validateIsArray(arr1[i], newArray1);
-  //   }
-  //   for (let y = 0; y < arr2.length; y++) {
-  //     validateIsArray(arr2[y], newArray2);
-  //   }
-  //   if (newArray1 === newArray2) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // } else {
-  //   return false;
-  // }
-// }
 
 
 
@@ -225,10 +156,61 @@ OrderedLinkedList.prototype.print = function(){
 // > LL.print()
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
-OrderedLinkedList.prototype.add = function(val){
-    
-}
+//OrderedLinkedList.prototype.add = function(val){
+//    if (!this.head) {
+//        this.head = new Node(val);
+//        return;
+//    }
+//    let newNode = new Node(val);
+//    if (!this.head.next) {             // Si tiene un solo elemento
+//        if(this.head.value > val) {    // Si ese unico elemento es mayor al nuevo.
+//            this.head.next = newNode;
+//            return;
+//        } else {                       // Si ese unico elemento es menor al nuevo
+//            this.head.next = this.head
+//            this.head = newNode;
+//            return;
+//        }
+//    } else {                           // Si tiene más de un elemento.
+//        let current = this.head;
+//        while (current.next.value > val) { // Recorre hasta que encuentra un next menor a val
+//            current = current.next
+//            if (!current.next) {           // Si no existe .next, llegó al final de la lista
+//                current.next = newNode;
+//                return;
+//            }  
+//        }
+//        let aux = current.next;
+//        current.next = newNode;
+//        current.next.next = aux;
+//        return;
+//    }
+//}
 
+OrderedLinkedList.prototype.add = function (val) {
+    let newNode = new Node(val);
+    if (!this.head) {                  // Si la lista está vacía, agrega this.head             
+        this.head = newNode;
+        return;
+    }
+    if (this.head.value < val) {       // Si head es menor al nuevo, reemplaza 
+        this.head.next = this.head;
+        this.head = newNode;
+        return;
+    }
+    let current = this.head;           // Si head es mayor al nuevo. 
+    while (current.next && current.next.value > val) {  // Mientras exista .next y .next.value sea mayor,
+        current = current.next                          // Recorre la lista hasta no cumplir una de las dos condiciones.    
+    }
+    if (!current.next) {               // Si no existe .next, se llegó al final de la lista,
+        current.next = newNode;        // y agrega nuevo nodo.
+        return;
+    }
+    let aux = current.next;            // Existe .next y .next.value es menor que el nuevo.
+    current.next = newNode;            // Nuevo reemplaza a .next, que pasa a ser el .next del nuevo.
+    current.next.next = aux;
+    return;
+}
 
 // EJERCICIO 5
 // Crea el metodo 'removeHigher' que deve devolver el valor mas alto de la linked list 
@@ -246,12 +228,10 @@ OrderedLinkedList.prototype.add = function(val){
 // < null
 
 OrderedLinkedList.prototype.removeHigher = function(){
-
-  if (!this.head) return null;
-  let ret = this.head.value;
-  this.head = this.head.next;
-  return ret;
-    
+    if (!this.head) return null;
+    let ret = this.head.value
+    this.head = this.head.next;
+    return ret;
 }
 
 
@@ -271,21 +251,22 @@ OrderedLinkedList.prototype.removeHigher = function(){
 // < null
 
 OrderedLinkedList.prototype.removeLower = function(){
-  if (!this.head) return null;
-  if (!this.head.next) {
-    let ret = this.head.value;
-    this.head = null;
+    if (!this.head) return null;
+    if (!this.head.next) {
+        let ret = this.head.value;
+        this.head = null;
+        return ret;
+    }
+    let anterior = this.head
+    let current = this.head.next
+    while (current.next) {
+        anterior = current;
+        current = current.next;
+    }
+    let ret = current.value;
+    anterior.next = null;
     return ret;
-  }
-  let anterior = this.head;
-  let current = this.head.next;
-  while (current.next) {
-    anterior = current;
-    current = current.next;
-  }
-  let ret = current.value;
-  anterior.next = null;
-  return ret;
+
 }
 
 
@@ -318,7 +299,13 @@ OrderedLinkedList.prototype.removeLower = function(){
 // < ["2-1", "1-1", "1-2", "2-2"];
 
 function multiCallbacks(cbs1, cbs2){
-    
+    let arr = cbs1.concat(cbs2);
+    let retArr = [];
+    arr.sort((a,b) => a.time > b.time ? 1 : -1);
+    for (let i = 0;i<arr.length;i++) {
+        retArr.push(arr[i].cb());
+    }
+    return retArr;    
 }
 
 
@@ -335,15 +322,16 @@ function multiCallbacks(cbs1, cbs2){
 //  / \
 // 5   9
 // resultado:[5,8,9,32,64]
+
 BinarySearchTree.prototype.toArray = function() {
-  let array = [];
-
-  this.depthFirstForEach(function (value) {
-    array.push(value);
-  }, "in-order");
-
-  return array;
+    let arr = [];
+    if (this.left) arr = arr.concat(this.left.toArray());
+    arr.push(this.value);
+    if (this.right) arr = arr.concat(this.right.toArray());
+    return arr;
 }
+
+
 
 // ----- Algoritmos -----
 
@@ -359,26 +347,12 @@ BinarySearchTree.prototype.toArray = function() {
 // informarse sobre algoritmos, leerlos de un pseudocodigo e implemnterlos alcanzara
 
 function primalityTest(n) {
-    let isPrimo = true;
-
-    if (n % n === 0 && n % 1 === 0) {
-      return (isPrimo = false);
-    } else {
-      return (isPrimo = false);
+    if(n < 2) return false;
+    if ((n > 2) && (n % 2 == 0)) return false;
+    for (let i = 2;i<=Math.sqrt(n);i++) {
+        if (n % i == 0) return false;
     }
-  // if (n <= 3) return n > 1;
-
-  // if (n % 2 === 0 || n % 3 === 0) return false;
-
-  // let count = 5;
-
-  // while (Math.pow(count, 2) <= n) {
-  //   if (n % count === 0 || n % (count + 2) === 0) return false;
-
-  //   count += 6;
-  // }
-
-  // return true;
+    return true;
 }
 
 
@@ -387,21 +361,33 @@ function primalityTest(n) {
 // retorn el mismo ordenado de 'mayor a menor!'
 // https://en.wikipedia.org/wiki/Quicksort
 
-function quickSort(array) {
-var arr = [];
-
-for (var i = 0; i < array; i++) {
-  if (array[i] < array[i] + 1) {
-    arr.push(array[i]);
-  }
-  return arr;
-}
-    
-}
-// QuickSort ya lo conocen solo que este 
+//function quickSort(array) {
+//    if (array.length<2) return array;
+//    let indicePivot = Math.floor(Math.random() * array.length);
+//    let pivot = array.splice(indicePivot,1);
+//    let mayores = [];
+//    let menores = [];
+//    array.forEach(x => x > pivot[0] ? mayores.push(x) : menores.push(x))
+//    return [...quickSort(mayores),...pivot,...quickSort(menores)]
+//}
+//// QuickSort ya lo conocen solo que este 
 // ordena de mayor a menor
 // para esto hay que unir como right+mid+left o cambiar el 
 // signo menor en la comparacion con el pivot
+
+function quickSort(array) {
+    // Implementar el método conocido como quickSort para ordenar de menor a mayor
+    // el array recibido como parámetro
+    // Devolver el array ordenado resultante
+    // Tu código:
+    if (array.length < 2) return array;
+    let indice = Math.floor(Math.random() * array.length);
+    let pivot = array.splice(indice,1);
+    let menores = [];
+    let mayores = [];
+    array.forEach(x => x > pivot[0] ? mayores.push(x) : menores.push(x))
+    return quickSort(mayores).concat(pivot.concat(quickSort(menores)));
+  }
 
 
 
@@ -418,7 +404,14 @@ for (var i = 0; i < array; i++) {
 // > reverse(95823);
 // < 32859
 
-function reverse(num) {}
+function reverse(num){
+    let nuevoNum = 0;
+    while (num>0) {
+        nuevoNum = nuevoNum * 10 + num % 10;
+        num = Math.floor(num / 10)
+    }
+    return nuevoNum;
+}
 // la grandiosa resolucion de Wilson!!!
 // declaran una variable donde 
 // almacenar el el numero invertido
